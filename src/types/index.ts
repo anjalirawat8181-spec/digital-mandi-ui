@@ -23,11 +23,22 @@ export interface LotBid {
   paymentCategory: "today" | "soon" | "credit";
 }
 
+export interface LotWeightDiscrepancy {
+  spokeWeightKg: number;
+  hubWeightKg: number;
+  differenceKg: number;
+  percentage: number;
+  requiresReview: boolean;
+}
+
 export interface Lot {
   id: string;
   crop: string;
   variety: string;
   weightKg: number;
+  spokeWeightKg?: number;
+  hubWeightKg?: number;
+  weightDiscrepancy?: LotWeightDiscrepancy;
   farmer: string;
   origin: string;
   destination: string;

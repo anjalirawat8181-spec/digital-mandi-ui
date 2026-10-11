@@ -24,7 +24,7 @@ function HubLotCard({
   onArrive: (lot: Lot) => void;
   onVerify: (lot: Lot, weightKg: number, grade: string) => void;
 }) {
-  const [checkedWeight, setCheckedWeight] = useState(String(lot.weightKg));
+  const [checkedWeight, setCheckedWeight] = useState(String(lot.hubWeightKg ?? lot.weightKg));
   const [grade, setGrade] = useState(lot.grade === "Pending" ? "A" : lot.grade);
   const [error, setError] = useState("");
 
@@ -57,7 +57,7 @@ function HubLotCard({
       <div className="hub-route">{lot.origin} <span>→</span> {lot.destination}</div>
       {column === "transit" && (
         <>
-          <div className="hub-weight-row"><span>Spoke weight</span><strong>{formatWeight(lot.weightKg)}</strong></div>
+          <div className="hub-weight-row"><span>Spoke weight</span><strong>{formatWeight(lot.spokeWeightKg ?? lot.weightKg)}</strong></div>
           <button className="hub-arrival-button" onClick={() => onArrive(lot)} type="button">⇢ &nbsp; Mark arrived at hub</button>
         </>
       )}
@@ -77,8 +77,14 @@ function HubLotCard({
       )}
       {column === "stored" && (
         <>
-          <div className="hub-weight-row"><span>Checked weight</span><strong>{formatWeight(lot.weightKg)}</strong></div>
-          <span className="hub-match-label">✓ Matches spoke report</span>
+          <div className="hub-weight-row"><span>Spoke weight</span><strong>{formatWeight(lot.spokeWeightKg ?? lot.weightKg)}</strong></div>
+          <div className="hub-weight-row"><span>Hub weight</span><strong>{lot.hubWeightKg === undefined ? "Not recorded" : formatWeight(lot.hubWeightKg)}</strong></div>
+          {lot.weightDiscrepancy?.requiresReview ? (
+            <span className="hub-discrepancy-label">⚠ Review required · {lot.weightDiscrepancy.percentage.toFixed(2)}%</span>
+          ) : lot.weightDiscrepancy ? (
+            <span className="hub-match-label">✓ Within 2% of spoke report</span>
+          ) : null}
+          <button className="hub-arrival-button" onClick={() => onArrive(lot)} type="button">↻ Recheck weight</button>
         </>
       )}
     </article>
@@ -86,7 +92,7 @@ function HubLotCard({
 }
 
 export default function HubDashboard() {
-  const { lots, gradeLot, updateLotStatus } = useLots();
+  const { lots, recordHubWeight, updateLotStatus } = useLots();
   const [hubFilter, setHubFilter] = useState<HubFilter>("All hubs");
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -118,8 +124,7 @@ export default function HubDashboard() {
   }
 
   function handleVerify(lot: Lot, weightKg: number, grade: string) {
-    gradeLot(lot.id, grade, weightKg, lot.destination);
-    updateLotStatus(lot.id, "Open for bids", 3);
+    recordHubWeight(lot.id, grade, weightKg, lot.destination);
   }
 
   const hubs: { name: HubFilter; subtitle: string }[] = [

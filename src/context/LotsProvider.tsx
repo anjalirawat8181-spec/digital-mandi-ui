@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { LotsContext, type LotsContextValue } from "./LotsContext";
 import { getLots } from "../services/lotService";
 import type { NewLotInput } from "../types";
+import { calculateWeightDiscrepancy } from "../utils/weightDiscrepancy";
 
 export default function LotsProvider({ children }: { children: ReactNode }) {
   const [lots, setLots] = useState(getLots);
@@ -10,12 +11,40 @@ export default function LotsProvider({ children }: { children: ReactNode }) {
     lots,
     getLot: (id) => lots.find((lot) => lot.id === id),
     gradeLot: (id, grade, weightKg, destination) => setLots((current) => current.map((lot) => (
-      lot.id === id ? { ...lot, grade, weightKg, destination, status: "Graded", stage: 2 } : lot
+      lot.id === id ? {
+        ...lot,
+        grade,
+        weightKg,
+        spokeWeightKg: weightKg,
+        hubWeightKg: undefined,
+        weightDiscrepancy: undefined,
+        destination,
+        status: "Graded",
+        stage: 2,
+      } : lot
     ))),
+    recordHubWeight: (id, grade, weightKg, destination) => setLots((current) => current.map((lot) => {
+      if (lot.id !== id) return lot;
+
+      const spokeWeightKg = lot.spokeWeightKg ?? lot.weightKg;
+      const weightDiscrepancy = calculateWeightDiscrepancy(spokeWeightKg, weightKg);
+      return {
+        ...lot,
+        grade,
+        weightKg,
+        spokeWeightKg,
+        hubWeightKg: weightKg,
+        destination,
+        status: "Open for bids",
+        stage: 3,
+        ...(weightDiscrepancy ? { weightDiscrepancy } : { weightDiscrepancy: undefined }),
+      };
+    })),
     addLot: (input: NewLotInput) => {
       const id = `lot-${Date.now()}`;
       const lot = {
         ...input,
+        spokeWeightKg: input.weightKg,
         id,
         variety: input.crop,
         origin: "Diphu Spoke",

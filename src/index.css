@@ -3323,6 +3323,65 @@ button {
   margin: 11px 0 10px;
 }
 
+.farmer-lot-id {
+  color: #65776e;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.farmer-weight-notifications {
+  display: grid;
+  gap: 9px;
+  margin: 0 0 14px;
+}
+
+.farmer-weight-notification {
+  padding: 14px 16px;
+  border: 1px solid #e9c878;
+  border-radius: 16px;
+  background: #fff8e8;
+  color: #493b1c;
+}
+
+.farmer-weight-notification-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #473814;
+}
+
+.farmer-weight-notification-heading span,
+.hub-discrepancy-label {
+  color: #805a0a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.farmer-weight-notification p {
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.farmer-weight-notification a {
+  color: #315c37;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.farmer-weight-notifications > small {
+  color: #68776b;
+  font-size: 11px;
+}
+
+.farmer-weight-resolved {
+  margin: 0 0 10px;
+  color: #426b3b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .farmer-lot-card .status-chip {
   min-height: 29px;
   margin: 0;
@@ -3343,6 +3402,14 @@ button {
 
 .farmer-lot-card .lot-tracker {
   margin: 19px 10px 17px;
+}
+
+.hub-discrepancy-label {
+  display: inline-flex;
+  margin-top: 8px;
+  padding: 6px 9px;
+  border-radius: 12px;
+  background: #fff3d5;
 }
 
 .farmer-lot-footer {
